@@ -2,12 +2,12 @@ import Folder from "../models/folder";
 import { Request, Response } from "express";
 
 export const getAllFolders = async (req: Request, res: Response) => {
-  // const {userId} = req.user;
-
   try {
-    const result = await Folder.find({
-      // user: userId,
-    });
+    const result = await Folder.find({});
+
+    if (result.length === 0) {
+      return res.json({ message: "There's no folder." });
+    }
 
     res.status(200).json(result);
   } catch (error) {
@@ -21,6 +21,11 @@ export const createFolder = async (req: Request, res: Response) => {
     const newFolder = new Folder({
       name: folderName,
     });
+
+    const alreadyExist = await Folder.find({ name: folderName }).exec();
+    if (alreadyExist.length) {
+      return res.json({ message: "Folder already exist." });
+    }
     const result = await newFolder.save();
     res.status(200).json(result);
   } catch (error) {

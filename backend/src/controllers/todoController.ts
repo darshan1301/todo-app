@@ -1,10 +1,15 @@
 import Todo from "../models/todo";
+import Folder from "../models/folder";
 import { Request, Response } from "express";
 
 export const getAllTodos = async (req: Request, res: Response) => {
   const { folderId } = req.params;
   try {
     const result = await Todo.find({ folder: folderId });
+
+    if (!result.length) {
+      return res.json({ message: "There's no item." });
+    }
     res.status(200).json(result);
   } catch (error) {
     console.error("Error getting all todos in this folder.", error);
@@ -13,13 +18,21 @@ export const getAllTodos = async (req: Request, res: Response) => {
 
 export const createTodo = async (req: Request, res: Response) => {
   const { folderId } = req.params;
-  // const { heading, description, dueDate = null } = req.body;
+  const { description } = req.body;
+
   try {
-    const newTodo = new Todo({
-      ...req.body,
+    const folder = await Folder.findById(folderId);
+    if (!folder) {
+      return res.json({ message: "Folder does not exist." });
+    }
+
+    const todo = new Todo({
+      description,
       folder: folderId,
     });
-    const result = newTodo.save();
+
+    const result = await todo.save();
+
     res.status(200).json(result);
   } catch (error) {
     console.error("Error creating new todo.", error);
@@ -28,6 +41,7 @@ export const createTodo = async (req: Request, res: Response) => {
 
 export const updateTodo = async (req: Request, res: Response) => {
   const todoId = req.params.todoId;
+  const { description } = req.body;
   try {
     const todo = await Todo.findById(todoId);
     if (!todo) {
@@ -35,7 +49,7 @@ export const updateTodo = async (req: Request, res: Response) => {
     }
     const updatedTodo = {
       ...todo.toObject(),
-      ...req.body,
+      description,
     };
     const result = await Todo.findByIdAndUpdate(todoId, updatedTodo);
     res.status(200).json(result);

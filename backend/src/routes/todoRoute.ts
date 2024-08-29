@@ -8,7 +8,7 @@ import {
 
 const router = express.Router();
 
-router.get("/", getAllTodos);
+router.get("/:folderId", getAllTodos);
 router.post("/:folderId", createTodo);
 router.put("/:todoId", updateTodo);
 router.delete("/:todoId", deleteTodo);
