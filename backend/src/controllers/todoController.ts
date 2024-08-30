@@ -41,7 +41,7 @@ export const createTodo = async (req: Request, res: Response) => {
 
 export const updateTodo = async (req: Request, res: Response) => {
   const todoId = req.params.todoId;
-  const { description } = req.body;
+
   try {
     const todo = await Todo.findById(todoId);
     if (!todo) {
@@ -49,7 +49,7 @@ export const updateTodo = async (req: Request, res: Response) => {
     }
     const updatedTodo = {
       ...todo.toObject(),
-      description,
+      ...req.body,
     };
     const result = await Todo.findByIdAndUpdate(todoId, updatedTodo);
     res.status(200).json(result);

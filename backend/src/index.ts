@@ -4,14 +4,17 @@ import todosRoute from "./routes/todoRoute";
 import folderRoute from "./routes/folderRoute";
 
 import cors from "cors";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(express.json({ limit: "5mb" }));
 app.use(cors());
 
-const dbURL: string = "mongodb://127.0.0.1:27017/todo-app";
+const dbURL: string = process.env.DBLINK as string;
 
 connectDB(dbURL);
 
